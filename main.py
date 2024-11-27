@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from utils.redis import connect_to_redis
 import json
+from collections import defaultdict
+from itertools import cycle
 
 app = Flask(__name__)
 
@@ -31,13 +33,25 @@ def get_offers():
 
     if sort_by == 'price':
         if sort_order == 'asc':
-            all_offers = sorted(all_offers, key=lambda x: x.get('price', 0)) 
+            all_offers = sorted(all_offers, key=lambda x: x.get('price', 0))
         elif sort_order == 'desc':
             all_offers = sorted(all_offers, key=lambda x: x.get('price', 0), reverse=True)
 
+    grouped_offers = defaultdict(list)
+    for offer in all_offers:
+        seller_id = offer.get("seller_id")
+        grouped_offers[seller_id].append(offer)
+
+    round_robin_result = []
+    sellers_cycle = cycle(grouped_offers.keys())
+    while len(round_robin_result) < len(all_offers):
+        seller_id = next(sellers_cycle)
+        if grouped_offers[seller_id]:
+            round_robin_result.append(grouped_offers[seller_id].pop(0))
+
     start = (page - 1) * limit
     end = start + limit
-    paginated_offers = all_offers[start:end]
+    paginated_offers = round_robin_result[start:end]
 
     return jsonify({
         "page": page,
