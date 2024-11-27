@@ -3,14 +3,21 @@ import uuid
 import random
 from services.redis import RedisService
 from services.offer import OfferService
-from config.connect_db import connect_to_db
+import psycopg2
+from config.load_env import Config
 
 def generate_dummy_data_with_redis():
     fake = Faker()
-    conn = connect_to_db()
+    connection = psycopg2.connect(
+                    dbname=Config.POSTGRES_DBNAME,
+                    host=Config.POSTGRES_HOST,
+                    port=Config.POSTGRES_PORT,
+                    user=Config.POSTGRES_USER,
+                    password=Config.POSTGRES_PASSWORD,
+                )
     redis_service = RedisService() 
     offer_service = OfferService(redis_service)  
-    cursor = conn.cursor()
+    cursor = connection.cursor()
 
     try:
         sellers = []
@@ -49,6 +56,6 @@ def generate_dummy_data_with_redis():
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
-        conn.commit()
+        connection.commit()
         cursor.close()
-        conn.close()
+        connection.close()

@@ -1,12 +1,14 @@
 import psycopg2
+from config.load_env import Config
 
 
 def create_g2g_tables():
     conn = psycopg2.connect(
-        dbname="g2g_offer_management",
-        user="postgres",
-        password="postgres",
-        host="localhost"
+        dbname=Config.POSTGRES_DBNAME,
+        host=Config.POSTGRES_HOST,
+        port=Config.POSTGRES_PORT,
+        user=Config.POSTGRES_USER,
+        password=Config.POSTGRES_PASSWORD,
     )
     cursor = conn.cursor()
 

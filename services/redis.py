@@ -1,9 +1,11 @@
 import redis
 import json
+import redis
+from config.load_env import Config
 
 class RedisService:
     
-    def __init__(self, host='127.0.0.1', port=6379, db=0):
+    def __init__(self, host=Config.REDIS_HOST, port=Config.REDIS_PORT, db=Config.REDIS_DB):
         self.redis_conn = redis.StrictRedis(
             host=host, port=port, db=db, decode_responses=True
         )
