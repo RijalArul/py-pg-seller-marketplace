@@ -8,11 +8,11 @@ app = Flask(__name__)
 def get_offers():
     redis_conn = connect_to_redis()
 
-    page = int(request.args.get('page', 1))  
-    limit = int(request.args.get('limit', 10))  
-    sort_by = request.args.get('sort_by', 'price') 
-    sort_order = request.args.get('sort_order', 'asc')  
-    category_filter = request.args.get('category', None)  
+    page = int(request.args.get('page', 1))
+    limit = int(request.args.get('limit', 10))
+    sort_by = request.args.get('sort_by', 'price')
+    sort_order = request.args.get('sort_order', 'asc')
+    category_filter = request.args.get('category', None) 
 
     offers_key = "offers"
 
@@ -29,8 +29,11 @@ def get_offers():
     if category_filter:
         all_offers = [offer for offer in all_offers if offer.get("category") == category_filter]
 
-    if sort_by and sort_order:
-        all_offers = sorted(all_offers, key=lambda x: x.get(sort_by, 0), reverse=(sort_order == 'desc'))
+    if sort_by == 'price':
+        if sort_order == 'asc':
+            all_offers = sorted(all_offers, key=lambda x: x.get('price', 0)) 
+        elif sort_order == 'desc':
+            all_offers = sorted(all_offers, key=lambda x: x.get('price', 0), reverse=True)
 
     start = (page - 1) * limit
     end = start + limit
