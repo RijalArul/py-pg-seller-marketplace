@@ -3,14 +3,14 @@ from config.load_env import Config
 
 
 def create_g2g_tables():
-    conn = psycopg2.connect(
+    connection = psycopg2.connect(
         dbname=Config.POSTGRES_DBNAME,
         host=Config.POSTGRES_HOST,
         port=Config.POSTGRES_PORT,
         user=Config.POSTGRES_USER,
         password=Config.POSTGRES_PASSWORD,
     )
-    cursor = conn.cursor()
+    cursor = connection.cursor()
 
     cursor.execute("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
 
@@ -57,9 +57,9 @@ def create_g2g_tables():
     """)
     print("Table 'offer' created successfully.")
 
-    conn.commit()
+    connection.commit()
     cursor.close()
-    conn.close()
+    connection.close()
     print("Tables 'seller' and 'offer' created successfully!")
 
 
