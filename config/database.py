@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from utils.redis import connect_to_redis
 
 def create_or_replace_database():
     try:
@@ -19,12 +20,19 @@ def create_or_replace_database():
         cursor.execute("CREATE DATABASE \"g2g_offer_management\";")
         print("Database 'g2g_offer_management' created successfully!")
 
+        redis_conn = connect_to_redis()
+
+        if redis_conn.exists("offers"):
+            redis_conn.delete("offers")
+            print("Redis key 'offers' has been deleted.")
+
+
         cursor.close()
         conn.close()
+        
 
     except Exception as e:
         print(f"Error while creating database: {e}")
 
-# Eksekusi fungsi
 if __name__ == "__main__":
     create_or_replace_database()
