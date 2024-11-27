@@ -5,6 +5,16 @@ from constants.redis import redis_key_offers
 def connect_to_redis():
     return redis.StrictRedis(host='127.0.0.1', port=6379, db=0, decode_responses=True)
 
+def fetch_data_from_redis(redis_conn, redis_key):
+    offers_string = redis_conn.get(redis_key)
+    if not offers_string:
+        return None, "No offers found in Redis"
+    
+    try:
+        return json.loads(offers_string), None
+    except json.JSONDecodeError:
+        return None, "Error decoding offers data from Redis"
+
 def save_offers_to_redis(redis_conn, offers, sellers):
     try:
         all_offers = []
