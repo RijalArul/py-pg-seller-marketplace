@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from utils.redis import connect_to_redis
+from services.redis import RedisService
 from constants.redis import redis_key_offers
 
 def create_or_replace_database():
@@ -21,7 +21,7 @@ def create_or_replace_database():
         cursor.execute("CREATE DATABASE \"g2g_offer_management\";")
         print("Database 'g2g_offer_management' created successfully!")
 
-        redis_conn = connect_to_redis()
+        redis_conn = RedisService()
 
         if redis_conn.exists(redis_key_offers):
             redis_conn.delete(redis_key_offers)

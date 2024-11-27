@@ -1,15 +1,15 @@
 from faker import Faker
-import random
 import uuid
-from utils.redis import connect_to_redis, save_offers_to_redis
+import random
+from services.redis import RedisService
+from services.offer import OfferService
 from config.connect_db import connect_to_db
-
-
 
 def generate_dummy_data_with_redis():
     fake = Faker()
     conn = connect_to_db()
-    redis_conn = connect_to_redis()
+    redis_service = RedisService() 
+    offer_service = OfferService(redis_service)  
     cursor = conn.cursor()
 
     try:
@@ -17,7 +17,7 @@ def generate_dummy_data_with_redis():
         for _ in range(20):  
             seller_id = str(uuid.uuid4())
             seller_name = fake.name()
-            seller_level = f"Level {random.randint(100, 200)}" 
+            seller_level = f"Level {random.randint(100, 200)}"
             sellers.append((seller_id, seller_name, seller_level))
 
         cursor.executemany("""
@@ -44,16 +44,11 @@ def generate_dummy_data_with_redis():
 
         print(f"Inserted {len(offers)} offers into the database.")
 
-        
-        save_offers_to_redis(redis_conn, offers, sellers)
+        offer_service.save_offers(offers, sellers)
 
-        conn.commit()
     except Exception as e:
-        print(f"Error: {e}")
-        conn.rollback()
+        print(f"An error occurred: {e}")
     finally:
+        conn.commit()
         cursor.close()
         conn.close()
-
-if __name__ == "__main__":
-    generate_dummy_data_with_redis()
