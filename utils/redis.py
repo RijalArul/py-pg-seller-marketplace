@@ -30,6 +30,7 @@ def save_offers_to_redis(redis_conn, offers, sellers):
 
             all_offers.append(offer_data)
 
+        redis_conn.delete("offers")
         redis_conn.set("offers", json.dumps(all_offers))
 
         print("All offers have been saved to Redis under the key 'offers'.")
