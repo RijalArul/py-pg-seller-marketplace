@@ -1,5 +1,6 @@
 import redis
 import json
+from constants.redis import redis_key_offers
 
 def connect_to_redis():
     return redis.StrictRedis(host='127.0.0.1', port=6379, db=0, decode_responses=True)
@@ -30,8 +31,8 @@ def save_offers_to_redis(redis_conn, offers, sellers):
 
             all_offers.append(offer_data)
 
-        redis_conn.delete("offers")
-        redis_conn.set("offers", json.dumps(all_offers))
+        redis_conn.delete(redis_key_offers)
+        redis_conn.set(redis_key_offers, json.dumps(all_offers))
 
         print("All offers have been saved to Redis under the key 'offers'.")
     except Exception as e:

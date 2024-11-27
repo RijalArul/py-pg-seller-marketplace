@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from utils.redis import connect_to_redis
+from constants.redis import redis_key_offers
 
 def create_or_replace_database():
     try:
@@ -22,8 +23,8 @@ def create_or_replace_database():
 
         redis_conn = connect_to_redis()
 
-        if redis_conn.exists("offers"):
-            redis_conn.delete("offers")
+        if redis_conn.exists(redis_key_offers):
+            redis_conn.delete(redis_key_offers)
             print("Redis key 'offers' has been deleted.")
 
 

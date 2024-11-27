@@ -3,6 +3,7 @@ from utils.redis import connect_to_redis
 import json
 from collections import defaultdict
 from itertools import cycle
+from constants.redis import redis_key_offers
 
 app = Flask(__name__)
 
@@ -16,7 +17,7 @@ def get_offers():
     sort_order = request.args.get('sort_order', 'asc')
     category_filter = request.args.get('category', None) 
 
-    offers_key = "offers"
+    offers_key = redis_key_offers
 
     offers_string = redis_conn.get(offers_key)
 
@@ -57,7 +58,7 @@ def get_offers():
         "page": page,
         "limit": limit,
         "total": len(all_offers), 
-        "offers": paginated_offers
+        redis_key_offers: paginated_offers
     }), 200
 
 
