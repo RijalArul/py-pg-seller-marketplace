@@ -1,18 +1,19 @@
 from flask import Flask, jsonify, request
-from utils.redis import connect_to_redis
 from constants.redis import redis_key_offers
 from utils.filter import filter_data_by_target
 from utils.function import apply_round_robin_offers
 from utils.paginaton import paginate_data_with_redis
 from utils.sort import sort_data
-from utils.redis import fetch_data_from_redis
+from services.redis import RedisService
+from services.offer import OfferService
 
 
 app = Flask(__name__)
 
 @app.route('/api/offers', methods=['GET'])
 def get_offers():
-    redis_conn = connect_to_redis()
+    redis_conn = RedisService()
+    offer_service = OfferService(redis_conn)
 
     page = int(request.args.get('page', 1))
     limit = int(request.args.get('limit', 10))
@@ -20,7 +21,7 @@ def get_offers():
     sort_order = request.args.get('sort_order', 'asc')
     category = request.args.get('category', None)
 
-    offers, error = fetch_data_from_redis(redis_conn, redis_key_offers)
+    offers, error = offer_service.fetch_offers()
     if error:
         return jsonify({"error": error}), 404 if "No offers" in error else 500
     
